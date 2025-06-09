@@ -147,7 +147,7 @@ function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: ApiKeys) 
           <ul className="text-sm space-y-1">
             <li>• OpenAI: <a href="https://platform.openai.com/api-keys" target="_blank" className="text-blue-600 hover:underline">platform.openai.com/api-keys</a></li>
             <li>• CDP Keys: <a href="https://portal.cdp.coinbase.com/access/api" target="_blank" className="text-blue-600 hover:underline">portal.cdp.coinbase.com/access/api</a></li>
-            <li>• From the downloaded JSON file, use the "name" field for CDP API Key Name and "privateKey" field for CDP Private Key</li>
+            <li>• From the downloaded JSON file, use the &quot;name&quot; field for CDP API Key Name and &quot;privateKey&quot; field for CDP Private Key</li>
           </ul>
         </div>
 
