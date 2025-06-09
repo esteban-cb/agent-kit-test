@@ -28,11 +28,15 @@ export async function POST(req: Request) {
       });
     }
 
-    // Validate CDP credentials (basic format check)
-    if (!cdpPrivateKey.startsWith("0x") || cdpPrivateKey.length < 64) {
+    // Validate CDP credentials (accept Base64, PEM, or hex formats)
+    const isPEMFormat = cdpPrivateKey.includes("-----BEGIN") && cdpPrivateKey.includes("-----END");
+    const isBase64Format = /^[A-Za-z0-9+/=]+$/.test(cdpPrivateKey) && cdpPrivateKey.length > 20;
+    const isHexFormat = cdpPrivateKey.startsWith("0x") && cdpPrivateKey.length >= 64;
+    
+    if (!isPEMFormat && !isBase64Format && !isHexFormat) {
       return NextResponse.json({
         valid: false,
-        error: "Invalid CDP private key format. Should start with '0x' and be at least 64 characters long."
+        error: "Invalid CDP private key format. Should be in PEM format (-----BEGIN EC PRIVATE KEY-----), Base64 format, or hex format (0x...)."
       });
     }
 
