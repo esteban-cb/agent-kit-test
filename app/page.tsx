@@ -168,7 +168,7 @@ function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: ApiKeys) 
                 <li>• Your API keys are <strong>never stored permanently</strong></li>
                 <li>• Keys only exist in memory during your session</li>
                 <li>• Refreshing the page will clear all keys</li>
-                <li>• No data is saved to your browser's storage</li>
+                <li>• No data is saved to your browser&apos;s storage</li>
                 <li>• Temporary server files are automatically cleaned up</li>
               </ul>
             </div>
