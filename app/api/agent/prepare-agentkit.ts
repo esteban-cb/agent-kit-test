@@ -55,7 +55,7 @@ type WalletData = {
  * Prepares the AgentKit and WalletProvider.
  *
  * @function prepareAgentkitAndWalletProvider
- * @param {ApiKeys} apiKeys - The API keys object containing cdpApiFile and networkId
+ * @param {ApiKeys} apiKeys - The API keys object containing cdpApiKeyName, cdpPrivateKey and networkId
  * @returns {Promise<{ agentkit: AgentKit, walletProvider: WalletProvider }>} The initialized AI agent.
  *
  * @description Handles agent setup with provided API keys
@@ -66,27 +66,30 @@ export async function prepareAgentkitAndWalletProvider(apiKeys: ApiKeys): Promis
   agentkit: AgentKit;
   walletProvider: WalletProvider;
 }> {
-  if (!apiKeys || !apiKeys.cdpApiFile) {
+  if (!apiKeys || !apiKeys.cdpApiKeyName || !apiKeys.cdpPrivateKey) {
     throw new Error(
-      "CDP API key file is required to connect to the Coinbase Developer Platform.",
+      "CDP API key name and private key are required to connect to the Coinbase Developer Platform.",
     );
   }
 
-  const { cdpApiFile, networkId } = apiKeys;
+  const { cdpApiKeyName, cdpPrivateKey, networkId } = apiKeys;
 
-  // Parse and create CDP API key file for AgentKit
+  // Create CDP API key file from manual input
   try {
-    console.log("Creating CDP API key file from uploaded data...");
-    const cdpKeyData = JSON.parse(cdpApiFile);
+    console.log("Creating CDP API key file from provided credentials...");
     
-    console.log("CDP Key file structure:", {
+    const cdpKeyData = {
+      name: cdpApiKeyName,
+      privateKey: cdpPrivateKey
+    };
+    
+    console.log("CDP Key data structure:", {
       hasName: !!cdpKeyData.name,
-      hasId: !!cdpKeyData.id,
       hasPrivateKey: !!cdpKeyData.privateKey,
       networkId: networkId
     });
 
-    fs.writeFileSync(CDP_API_KEY_FILE, cdpApiFile);
+    fs.writeFileSync(CDP_API_KEY_FILE, JSON.stringify(cdpKeyData, null, 2));
     console.log("CDP API key file created successfully");
   } catch (error) {
     console.error("Error creating CDP API key file:", error);

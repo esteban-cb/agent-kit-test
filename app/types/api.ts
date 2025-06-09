@@ -4,6 +4,7 @@ export type AgentResponse = { response?: string; error?: string };
 
 export interface ApiKeys {
   openaiKey: string;
-  cdpApiFile: string;
+  cdpApiKeyName: string;
+  cdpPrivateKey: string;
   networkId: string;
 }

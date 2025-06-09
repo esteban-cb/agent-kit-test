@@ -28,7 +28,7 @@ const agentCache = new Map<string, ReturnType<typeof createReactAgent>>();
  * Creates a simple hash of the API keys for caching purposes
  */
 function hashApiKeys(apiKeys: ApiKeys): string {
-  const keyString = `${apiKeys.openaiKey}_${apiKeys.cdpApiFile}_${apiKeys.networkId}`;
+  const keyString = `${apiKeys.openaiKey}_${apiKeys.cdpApiKeyName}_${apiKeys.cdpPrivateKey}_${apiKeys.networkId}`;
   return Buffer.from(keyString).toString('base64').substring(0, 20);
 }
 
@@ -37,7 +37,7 @@ function hashApiKeys(apiKeys: ApiKeys): string {
  * If an agent instance already exists for these API keys, it returns the existing one.
  *
  * @function createAgent
- * @param {ApiKeys} apiKeys - The API keys object containing openaiKey, cdpApiFile, and networkId
+ * @param {ApiKeys} apiKeys - The API keys object containing openaiKey, cdpApiKeyName, cdpPrivateKey, and networkId
  * @returns {Promise<ReturnType<typeof createReactAgent>>} The initialized AI agent.
  *
  * @description Handles agent setup with provided API keys
@@ -49,10 +49,10 @@ export async function createAgent(apiKeys: ApiKeys): Promise<ReturnType<typeof c
     throw new Error("API keys are required to create an agent.");
   }
 
-  const { openaiKey, cdpApiFile, networkId } = apiKeys;
+  const { openaiKey, cdpApiKeyName, cdpPrivateKey, networkId } = apiKeys;
 
-  if (!openaiKey || !cdpApiFile) {
-    throw new Error("Both OpenAI API key and CDP API file are required to create an agent.");
+  if (!openaiKey || !cdpApiKeyName || !cdpPrivateKey) {
+    throw new Error("OpenAI API key, CDP API key name, and CDP private key are required to create an agent.");
   }
 
   // Check if we already have an agent for these keys
@@ -115,7 +115,8 @@ export async function createAgent(apiKeys: ApiKeys): Promise<ReturnType<typeof c
       stack: error instanceof Error ? error.stack : undefined,
       apiKeysProvided: {
         openaiKey: !!openaiKey,
-        cdpApiFile: !!cdpApiFile,
+        cdpApiKeyName: !!cdpApiKeyName,
+        cdpPrivateKey: !!cdpPrivateKey,
         networkId: networkId
       }
     });

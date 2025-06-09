@@ -8,52 +8,32 @@ import { ApiKeys } from "./types/api";
 // Component for API Key Configuration
 function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: ApiKeys) => void }) {
   const [openaiKey, setOpenaiKey] = useState("");
-  const [cdpApiFile, setCdpApiFile] = useState<File | null>(null);
+  const [cdpApiKeyName, setCdpApiKeyName] = useState("");
+  const [cdpPrivateKey, setCdpPrivateKey] = useState("");
   const [networkId, setNetworkId] = useState("base-sepolia");
   const [isValidating, setIsValidating] = useState(false);
   const [error, setError] = useState("");
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type === "application/json") {
-      setCdpApiFile(file);
-      setError("");
-    } else {
-      setCdpApiFile(null);
-      setError("Please select a valid JSON file");
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     
-    if (!openaiKey.trim() || !cdpApiFile) {
-      setError("OpenAI API key and CDP API key JSON file are required");
+    if (!openaiKey.trim() || !cdpApiKeyName.trim() || !cdpPrivateKey.trim()) {
+      setError("All fields are required: OpenAI API key, CDP API key name, and CDP private key");
       return;
     }
 
     setIsValidating(true);
     
     try {
-      // Read the CDP API key file
-      const fileContent = await cdpApiFile.text();
-      const cdpKeyData = JSON.parse(fileContent);
-
-      // Validate file structure
-      if (!cdpKeyData.privateKey || (!cdpKeyData.name && !cdpKeyData.id)) {
-        setError("Invalid CDP API key file format");
-        setIsValidating(false);
-        return;
-      }
-
       // Test the API keys by making a call to our validation endpoint
       const response = await fetch("/api/validate-keys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           openaiKey: openaiKey.trim(),
-          cdpApiFile: fileContent,
+          cdpApiKeyName: cdpApiKeyName.trim(),
+          cdpPrivateKey: cdpPrivateKey.trim(),
           networkId: networkId
         }),
       });
@@ -63,7 +43,8 @@ function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: ApiKeys) 
       if (result.valid) {
         onKeysConfigured({
           openaiKey: openaiKey.trim(),
-          cdpApiFile: fileContent,
+          cdpApiKeyName: cdpApiKeyName.trim(),
+          cdpPrivateKey: cdpPrivateKey.trim(),
           networkId: networkId
         });
       } else {
@@ -81,7 +62,7 @@ function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: ApiKeys) 
       <div className="w-full max-w-lg bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
         <h1 className="text-2xl font-bold text-center mb-6">Configure API Keys</h1>
         <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-          Please enter your OpenAI API key and upload your CDP API key JSON file
+          Please enter your OpenAI API key and CDP credentials
         </p>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,20 +82,30 @@ function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: ApiKeys) 
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              CDP API Key JSON File
+              CDP API Key Name
             </label>
             <input
-              type="file"
-              accept=".json,application/json"
-              onChange={handleFileChange}
-              className="w-full p-3 rounded border dark:bg-gray-700 dark:border-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              type="text"
+              value={cdpApiKeyName}
+              onChange={(e) => setCdpApiKeyName(e.target.value)}
+              placeholder="Enter your CDP API key name"
+              className="w-full p-3 rounded border dark:bg-gray-700 dark:border-gray-600"
               disabled={isValidating}
             />
-            {cdpApiFile && (
-              <p className="text-sm text-green-600 mt-1">
-                ✓ {cdpApiFile.name} selected
-              </p>
-            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              CDP Private Key
+            </label>
+            <input
+              type="password"
+              value={cdpPrivateKey}
+              onChange={(e) => setCdpPrivateKey(e.target.value)}
+              placeholder="Enter your CDP private key"
+              className="w-full p-3 rounded border dark:bg-gray-700 dark:border-gray-600"
+              disabled={isValidating}
+            />
           </div>
 
           <div>
@@ -155,7 +146,8 @@ function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: ApiKeys) 
           <h3 className="font-semibold mb-2">Where to get your API keys:</h3>
           <ul className="text-sm space-y-1">
             <li>• OpenAI: <a href="https://platform.openai.com/api-keys" target="_blank" className="text-blue-600 hover:underline">platform.openai.com/api-keys</a></li>
-            <li>• CDP Keys: <a href="https://portal.cdp.coinbase.com/access/api" target="_blank" className="text-blue-600 hover:underline">portal.cdp.coinbase.com/access/api</a> (download JSON file)</li>
+            <li>• CDP Keys: <a href="https://portal.cdp.coinbase.com/access/api" target="_blank" className="text-blue-600 hover:underline">portal.cdp.coinbase.com/access/api</a></li>
+            <li>• From the downloaded JSON file, use the "name" field for CDP API Key Name and "privateKey" field for CDP Private Key</li>
           </ul>
         </div>
 

@@ -31,9 +31,9 @@ export async function POST(
       });
     }
 
-    if (!apiKeys.openaiKey || !apiKeys.cdpApiFile) {
+    if (!apiKeys.openaiKey || !apiKeys.cdpApiKeyName || !apiKeys.cdpPrivateKey) {
       return NextResponse.json({
-        error: "Both OpenAI API key and CDP API file are required."
+        error: "OpenAI API key, CDP API key name, and CDP private key are required."
       });
     }
 

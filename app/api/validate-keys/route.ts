@@ -3,12 +3,12 @@ import { ChatOpenAI } from "@langchain/openai";
 
 export async function POST(req: Request) {
   try {
-    const { openaiKey, cdpApiFile } = await req.json();
+    const { openaiKey, cdpApiKeyName, cdpPrivateKey } = await req.json();
 
-    if (!openaiKey || !cdpApiFile) {
+    if (!openaiKey || !cdpApiKeyName || !cdpPrivateKey) {
       return NextResponse.json({
         valid: false,
-        error: "OpenAI API key and CDP API file are required"
+        error: "OpenAI API key, CDP API key name, and CDP private key are required"
       });
     }
 
@@ -28,20 +28,18 @@ export async function POST(req: Request) {
       });
     }
 
-    // Validate CDP API file structure
-    try {
-      const cdpKeyData = JSON.parse(cdpApiFile);
-      
-      if (!cdpKeyData.privateKey || (!cdpKeyData.name && !cdpKeyData.id)) {
-        return NextResponse.json({
-          valid: false,
-          error: "Invalid CDP API key file format. File must contain 'privateKey' and either 'name' or 'id' field."
-        });
-      }
-    } catch {
+    // Validate CDP credentials (basic format check)
+    if (!cdpPrivateKey.startsWith("0x") || cdpPrivateKey.length < 64) {
       return NextResponse.json({
         valid: false,
-        error: "Invalid JSON format in CDP API key file"
+        error: "Invalid CDP private key format. Should start with '0x' and be at least 64 characters long."
+      });
+    }
+
+    if (cdpApiKeyName.trim().length < 3) {
+      return NextResponse.json({
+        valid: false,
+        error: "CDP API key name should be at least 3 characters long."
       });
     }
 
