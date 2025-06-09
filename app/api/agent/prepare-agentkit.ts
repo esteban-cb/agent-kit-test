@@ -9,9 +9,9 @@ import {
   wethActionProvider,
 } from "@coinbase/agentkit";
 import * as fs from "fs";
-import * as path from "path";
 import { Address, Hex } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { ApiKeys } from "@/app/types/api";
 
 /**
  * AgentKit Integration Route
@@ -55,14 +55,14 @@ type WalletData = {
  * Prepares the AgentKit and WalletProvider.
  *
  * @function prepareAgentkitAndWalletProvider
- * @param {any} apiKeys - The API keys object containing cdpApiFile and networkId
+ * @param {ApiKeys} apiKeys - The API keys object containing cdpApiFile and networkId
  * @returns {Promise<{ agentkit: AgentKit, walletProvider: WalletProvider }>} The initialized AI agent.
  *
  * @description Handles agent setup with provided API keys
  *
  * @throws {Error} If the agent initialization fails.
  */
-export async function prepareAgentkitAndWalletProvider(apiKeys: any): Promise<{
+export async function prepareAgentkitAndWalletProvider(apiKeys: ApiKeys): Promise<{
   agentkit: AgentKit;
   walletProvider: WalletProvider;
 }> {
@@ -102,8 +102,9 @@ export async function prepareAgentkitAndWalletProvider(apiKeys: any): Promise<{
       walletData = JSON.parse(fs.readFileSync(WALLET_DATA_FILE, "utf8")) as WalletData;
       privateKey = walletData.privateKey;
       console.log("Loaded existing wallet data");
-    } catch (error) {
-      console.error("Error reading wallet data:", error);
+    } catch {
+      // Error reading wallet data - we'll generate a new one
+      console.log("Could not read existing wallet data, will generate new");
     }
   }
 
@@ -173,8 +174,9 @@ export async function prepareAgentkitAndWalletProvider(apiKeys: any): Promise<{
         fs.unlinkSync(CDP_API_KEY_FILE);
         console.log("Cleaned up temporary CDP API key file");
       }
-    } catch (error) {
-      console.error("Error cleaning up CDP API key file:", error);
+    } catch {
+      // Ignore cleanup errors
+      console.log("Could not clean up temporary CDP API key file");
     }
   }
 }

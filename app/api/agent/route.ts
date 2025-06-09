@@ -1,4 +1,4 @@
-import { AgentRequest, AgentResponse } from "@/app/types/api";
+import { AgentRequest, AgentResponse, ApiKeys } from "@/app/types/api";
 import { NextResponse } from "next/server";
 import { createAgent } from "./create-agent";
 /**
@@ -6,7 +6,7 @@ import { createAgent } from "./create-agent";
  * This function processes user messages and streams responses from the agent.
  *
  * @function POST
- * @param {Request & { json: () => Promise<AgentRequest & { apiKeys?: any }> }} req - The incoming request object containing the user message and API keys.
+ * @param {Request & { json: () => Promise<AgentRequest & { apiKeys?: ApiKeys }> }} req - The incoming request object containing the user message and API keys.
  * @returns {Promise<NextResponse<AgentResponse>>} JSON response containing the AI-generated reply or an error message.
  *
  * @description Sends a single message to the agent and returns the agents' final response.
@@ -19,7 +19,7 @@ import { createAgent } from "./create-agent";
  * });
  */
 export async function POST(
-  req: Request & { json: () => Promise<AgentRequest & { apiKeys?: any }> },
+  req: Request & { json: () => Promise<AgentRequest & { apiKeys?: ApiKeys }> },
 ): Promise<NextResponse<AgentResponse>> {
   try {
     // 1️. Extract user message and API keys from the request body

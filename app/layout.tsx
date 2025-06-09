@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import "./globals.css";
 
 /**
@@ -26,9 +27,11 @@ export default function RootLayout({
       <body className="bg-gray-100 dark:bg-gray-900 dark flex flex-col min-h-screen">
         {/* Header (Fixed Height) */}
         <header className="py-6 flex items-center justify-between relative">
-          <img
+          <Image
             src="https://images.ctfassets.net/q5ulk4bp65r7/3TBS4oVkD1ghowTqVQJlqj/2dfd4ea3b623a7c0d8deb2ff445dee9e/Consumer_Wordmark.svg"
             alt="Coinbase"
+            width={120}
+            height={32}
             className="h-8 ml-4"
           />
 
@@ -42,9 +45,11 @@ export default function RootLayout({
 
         {/* Footer (Fixed Height) */}
         <footer className="py-4 text-center text-gray-500 dark:text-gray-400 flex-none">
-          <img
+          <Image
             src="https://images.ctfassets.net/q5ulk4bp65r7/3TBS4oVkD1ghowTqVQJlqj/2dfd4ea3b623a7c0d8deb2ff445dee9e/Consumer_Wordmark.svg"
             alt="Coinbase"
+            width={96}
+            height={24}
             className="h-6 mx-auto mb-2"
           />
           <div className="mt-2">

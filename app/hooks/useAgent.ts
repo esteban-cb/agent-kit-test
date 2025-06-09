@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AgentRequest, AgentResponse } from "../types/api";
+import { AgentRequest, AgentResponse, ApiKeys } from "../types/api";
 
 /**
  * Sends a user message to the AgentKit backend API and retrieves the agent's response.
@@ -7,17 +7,17 @@ import { AgentRequest, AgentResponse } from "../types/api";
  * @async
  * @function callAgentAPI
  * @param {string} userMessage - The message sent by the user.
- * @param {any} apiKeys - The API keys to use for the request.
+ * @param {ApiKeys} apiKeys - The API keys to use for the request.
  * @returns {Promise<string | null>} The agent's response message or `null` if an error occurs.
  *
  * @throws {Error} Logs an error if the request fails.
  */
-async function messageAgent(userMessage: string, apiKeys?: any): Promise<string | null> {
+async function messageAgent(userMessage: string, apiKeys?: ApiKeys): Promise<string | null> {
   try {
     const response = await fetch("/api/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userMessage, apiKeys } as AgentRequest & { apiKeys?: any }),
+      body: JSON.stringify({ userMessage, apiKeys } as AgentRequest & { apiKeys?: ApiKeys }),
     });
 
     const data = (await response.json()) as AgentResponse;
@@ -52,14 +52,14 @@ async function messageAgent(userMessage: string, apiKeys?: any): Promise<string 
 export function useAgent() {
   const [messages, setMessages] = useState<{ text: string; sender: "user" | "agent" }[]>([]);
   const [isThinking, setIsThinking] = useState(false);
-  const [apiKeys, setApiKeysState] = useState<any>(null);
+  const [apiKeys, setApiKeysState] = useState<ApiKeys | null>(null);
 
   /**
    * Sets the API keys for the agent.
    *
-   * @param {any} keys - The API keys object.
+   * @param {ApiKeys} keys - The API keys object.
    */
-  const setApiKeys = (keys: any) => {
+  const setApiKeys = (keys: ApiKeys) => {
     setApiKeysState(keys);
   };
 
@@ -74,7 +74,7 @@ export function useAgent() {
     setMessages(prev => [...prev, { text: input, sender: "user" }]);
     setIsThinking(true);
 
-    const responseMessage = await messageAgent(input, apiKeys);
+    const responseMessage = await messageAgent(input, apiKeys || undefined);
 
     if (responseMessage) {
       setMessages(prev => [...prev, { text: responseMessage, sender: "agent" }]);

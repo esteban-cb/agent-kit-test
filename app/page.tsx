@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useAgent } from "./hooks/useAgent";
 import ReactMarkdown from "react-markdown";
+import { ApiKeys } from "./types/api";
 
 // Component for API Key Configuration
-function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: any) => void }) {
+function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: ApiKeys) => void }) {
   const [openaiKey, setOpenaiKey] = useState("");
   const [cdpApiFile, setCdpApiFile] = useState<File | null>(null);
   const [networkId, setNetworkId] = useState("base-sepolia");
@@ -68,7 +69,7 @@ function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: any) => v
       } else {
         setError(result.error || "Invalid API keys");
       }
-    } catch (error) {
+    } catch {
       setError("Failed to validate API keys. Please check your keys and try again.");
     } finally {
       setIsValidating(false);
@@ -157,6 +158,22 @@ function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: any) => v
             <li>• CDP Keys: <a href="https://portal.cdp.coinbase.com/access/api" target="_blank" className="text-blue-600 hover:underline">portal.cdp.coinbase.com/access/api</a> (download JSON file)</li>
           </ul>
         </div>
+
+        <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-800">
+          <div className="flex items-start space-x-2">
+            <div className="text-green-600 dark:text-green-400 mt-0.5">🔒</div>
+            <div>
+              <h3 className="font-semibold text-green-800 dark:text-green-200 mb-1">Security & Privacy</h3>
+              <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
+                <li>• Your API keys are <strong>never stored permanently</strong></li>
+                <li>• Keys only exist in memory during your session</li>
+                <li>• Refreshing the page will clear all keys</li>
+                <li>• No data is saved to your browser's storage</li>
+                <li>• Temporary server files are automatically cleaned up</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -170,7 +187,6 @@ function ApiKeyConfig({ onKeysConfigured }: { onKeysConfigured: (keys: any) => v
 export default function Home() {
   const [input, setInput] = useState("");
   const [isConfigured, setIsConfigured] = useState(false);
-  const [apiKeys, setApiKeys] = useState<any>(null);
   const { messages, sendMessage, isThinking, setApiKeys: setAgentApiKeys } = useAgent();
 
   // Ref for the messages container
@@ -186,8 +202,7 @@ export default function Home() {
     scrollToBottom();
   }, [messages]);
 
-  const onKeysConfigured = (keys: any) => {
-    setApiKeys(keys);
+  const onKeysConfigured = (keys: ApiKeys) => {
     setAgentApiKeys(keys);
     setIsConfigured(true);
   };
@@ -201,8 +216,6 @@ export default function Home() {
 
   const resetConfiguration = () => {
     setIsConfigured(false);
-    setApiKeys(null);
-    setAgentApiKeys(null);
   };
 
   if (!isConfigured) {
@@ -214,7 +227,13 @@ export default function Home() {
       <div className="w-full max-w-2xl h-[70vh] bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 flex flex-col">
         {/* Header with config reset */}
         <div className="flex justify-between items-center mb-4 pb-2 border-b dark:border-gray-600">
-          <h2 className="text-lg font-semibold">AgentKit Chat</h2>
+          <div className="flex items-center space-x-2">
+            <h2 className="text-lg font-semibold">AgentKit Chat</h2>
+            <div className="flex items-center space-x-1 text-xs text-green-600 dark:text-green-400">
+              <span>🔒</span>
+              <span>Session-only</span>
+            </div>
+          </div>
           <button
             onClick={resetConfiguration}
             className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"

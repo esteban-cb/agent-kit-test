@@ -3,7 +3,7 @@ import { ChatOpenAI } from "@langchain/openai";
 
 export async function POST(req: Request) {
   try {
-    const { openaiKey, cdpApiFile, networkId } = await req.json();
+    const { openaiKey, cdpApiFile } = await req.json();
 
     if (!openaiKey || !cdpApiFile) {
       return NextResponse.json({
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
       
       // Make a minimal test call
       await testLLM.invoke("Hello");
-    } catch (error) {
+    } catch {
       return NextResponse.json({
         valid: false,
         error: "Invalid OpenAI API key"
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
           error: "Invalid CDP API key file format. File must contain 'privateKey' and either 'name' or 'id' field."
         });
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json({
         valid: false,
         error: "Invalid JSON format in CDP API key file"
@@ -50,8 +50,7 @@ export async function POST(req: Request) {
       message: "API keys validated successfully"
     });
 
-  } catch (error) {
-    console.error("Validation error:", error);
+  } catch {
     return NextResponse.json({
       valid: false,
       error: "Failed to validate API keys"

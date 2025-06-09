@@ -3,6 +3,7 @@ import { MemorySaver } from "@langchain/langgraph";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenAI } from "@langchain/openai";
 import { prepareAgentkitAndWalletProvider } from "./prepare-agentkit";
+import { ApiKeys } from "@/app/types/api";
 
 /**
  * Agent Configuration Guide
@@ -26,7 +27,7 @@ const agentCache = new Map<string, ReturnType<typeof createReactAgent>>();
 /**
  * Creates a simple hash of the API keys for caching purposes
  */
-function hashApiKeys(apiKeys: any): string {
+function hashApiKeys(apiKeys: ApiKeys): string {
   const keyString = `${apiKeys.openaiKey}_${apiKeys.cdpApiFile}_${apiKeys.networkId}`;
   return Buffer.from(keyString).toString('base64').substring(0, 20);
 }
@@ -36,14 +37,14 @@ function hashApiKeys(apiKeys: any): string {
  * If an agent instance already exists for these API keys, it returns the existing one.
  *
  * @function createAgent
- * @param {any} apiKeys - The API keys object containing openaiKey, cdpApiFile, and networkId
+ * @param {ApiKeys} apiKeys - The API keys object containing openaiKey, cdpApiFile, and networkId
  * @returns {Promise<ReturnType<typeof createReactAgent>>} The initialized AI agent.
  *
  * @description Handles agent setup with provided API keys
  *
  * @throws {Error} If the agent initialization fails.
  */
-export async function createAgent(apiKeys: any): Promise<ReturnType<typeof createReactAgent>> {
+export async function createAgent(apiKeys: ApiKeys): Promise<ReturnType<typeof createReactAgent>> {
   if (!apiKeys) {
     throw new Error("API keys are required to create an agent.");
   }
